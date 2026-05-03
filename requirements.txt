@@ -21,3 +21,4 @@ protobuf>=3.20.0
 
 # Utilities
 huggingface-hub>=0.24.0
+numpy==1.26.4
