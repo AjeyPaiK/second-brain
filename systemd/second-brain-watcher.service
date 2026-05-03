@@ -1,0 +1,17 @@
+[Unit]
+Description=Second Brain — PDF watcher
+After=network-online.target ollama.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Projects/second-brain
+ExecStart=%h/Projects/second-brain/.venv/bin/python -m app.watcher
+Restart=on-failure
+RestartSec=3
+StandardOutput=append:%h/Projects/second-brain/logs/watcher.systemd.log
+StandardError=append:%h/Projects/second-brain/logs/watcher.systemd.log
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,2 @@
+[2026-05-02 01:33:21] INGESTED project=test_project file=sample.pdf pages=3 chunks=3 took=3.88s
+[2026-05-02 01:34:18] INGESTED project=notes file=physics_bio.pdf pages=2 chunks=2 took=0.54s

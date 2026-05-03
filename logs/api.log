@@ -1,0 +1,10 @@
+2026-05-02 01:35:55,280 INFO httpx HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-05-02 01:36:01,875 INFO api query project=all top_k=4 q='What is the Eiffel Tower and where is it?'
+2026-05-02 01:36:01,983 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/embeddings "HTTP/1.1 200 OK"
+2026-05-02 01:36:53,835 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2026-05-02 01:37:31,833 INFO api query project=notes top_k=3 q='How does photosynthesis work?'
+2026-05-02 01:37:39,940 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/embeddings "HTTP/1.1 200 OK"
+2026-05-02 01:38:33,215 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2026-05-02 01:38:34,125 INFO api query project=all top_k=3 q='What is the recipe for sourdough bread?'
+2026-05-02 01:38:41,737 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/embeddings "HTTP/1.1 200 OK"
+2026-05-02 01:39:36,167 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"

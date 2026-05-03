@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1220" />
+<title>Second Brain</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #131c2e;
+    --panel-2: #0f1729;
+    --text: #e6edf7;
+    --muted: #95a3bd;
+    --accent: #5b9dff;
+    --accent-2: #2bd4a4;
+    --border: #1f2a44;
+    --danger: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 16px;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  h1 { font-size: 20px; margin: 4px 0 12px 0; display:flex; align-items:center; gap:8px;}
+  h1 .dot { width:10px; height:10px; border-radius:50%; background: var(--accent-2); display:inline-block; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  select, textarea, button, input {
+    font: inherit; color: var(--text); background: var(--panel);
+    border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+    width: 100%;
+  }
+  select { -webkit-appearance: none; appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                      linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+    background-size: 5px 5px; background-repeat: no-repeat; padding-right: 32px; }
+  textarea { min-height: 90px; resize: vertical; }
+  button { background: var(--accent); border-color: var(--accent); color: #061224;
+    font-weight: 600; cursor: pointer; transition: filter .15s; }
+  button:hover { filter: brightness(1.05); }
+  button:disabled { opacity: 0.5; cursor: progress; }
+  .card { background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+  .label { color: var(--muted); font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 6px; }
+  .answer { white-space: pre-wrap; word-wrap: break-word; }
+  .src { border-top: 1px dashed var(--border); padding-top: 10px; margin-top: 10px; }
+  .src:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+  .src .meta { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .src .snippet { font-size: 14px; color: #cdd6e4; }
+  .pill { display:inline-block; padding: 2px 8px; border-radius: 999px;
+    background: var(--panel); border: 1px solid var(--border); font-size: 12px;
+    color: var(--muted); margin-right: 6px; }
+  .err { color: var(--danger); }
+  .footer { color: var(--muted); font-size: 12px; margin-top: 18px; text-align: center; }
+  @media (max-width: 520px) { h1 { font-size: 18px; } .card { padding: 12px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="dot"></span> Second Brain</h1>
+
+  <div class="row">
+    <select id="project" aria-label="Project"></select>
+  </div>
+  <div class="row">
+    <textarea id="q" placeholder="Ask a question about your documents…"
+              autocapitalize="sentences" autocomplete="off"></textarea>
+  </div>
+  <div class="row">
+    <button id="ask">Ask</button>
+  </div>
+
+  <div id="status" class="card" style="display:none"></div>
+
+  <div id="answerCard" class="card" style="display:none">
+    <div class="label">Answer</div>
+    <div id="answer" class="answer"></div>
+    <div class="label" style="margin-top:14px">Used</div>
+    <div id="used"></div>
+  </div>
+
+  <div id="sourcesCard" class="card" style="display:none">
+    <div class="label">Sources</div>
+    <div id="sources"></div>
+  </div>
+
+  <div class="footer">100% local · Ollama · ChromaDB</div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+async function loadProjects() {
+  const sel = $("project");
+  sel.innerHTML = '<option value="all">All projects</option>';
+  try {
+    const r = await fetch("/projects");
+    const data = await r.json();
+    for (const p of data.projects || []) {
+      const opt = document.createElement("option");
+      opt.value = p.name;
+      opt.textContent = `${p.name}` + (p.count != null ? ` (${p.count})` : "");
+      sel.appendChild(opt);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function renderSources(sources) {
+  const box = $("sources");
+  box.innerHTML = "";
+  if (!sources || !sources.length) {
+    $("sourcesCard").style.display = "none";
+    return;
+  }
+  for (const s of sources) {
+    const div = document.createElement("div");
+    div.className = "src";
+    div.innerHTML =
+      `<div class="meta">
+         <span class="pill">${escapeHtml(s.project)}</span>
+         <strong>${escapeHtml(s.source)}</strong> · page ${s.page}
+         · score ${s.score}
+       </div>
+       <div class="snippet">${escapeHtml(s.snippet)}…</div>`;
+    box.appendChild(div);
+  }
+  $("sourcesCard").style.display = "";
+}
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+async function ask() {
+  const q = $("q").value.trim();
+  if (!q) return;
+  const project = $("project").value;
+  const askBtn = $("ask");
+  askBtn.disabled = true; askBtn.textContent = "Thinking…";
+  $("status").style.display = "none";
+  $("answerCard").style.display = "none";
+  $("sourcesCard").style.display = "none";
+  try {
+    const r = await fetch("/query", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q, project, top_k: 6 }),
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      throw new Error(`HTTP ${r.status}: ${t}`);
+    }
+    const data = await r.json();
+    $("answer").textContent = data.answer || "(empty)";
+    $("used").innerHTML = (data.used_collections || [])
+      .map(c => `<span class="pill">${escapeHtml(c)}</span>`).join(" ") || "<em>none</em>";
+    $("answerCard").style.display = "";
+    renderSources(data.sources);
+  } catch (e) {
+    $("status").style.display = "";
+    $("status").innerHTML = `<span class="err">${escapeHtml(e.message)}</span>`;
+  } finally {
+    askBtn.disabled = false; askBtn.textContent = "Ask";
+  }
+}
+
+$("ask").addEventListener("click", ask);
+$("q").addEventListener("keydown", (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") ask();
+});
+loadProjects();
+</script>
+</body>
+</html>
