@@ -89,14 +89,20 @@ def understand(data_path, adapter_name, base_model, epochs, lr, max_seq, batch):
 
 @cli.command()
 @click.option("--adapter", "adapter_name", required=True, help="Adapter name")
-@click.option("--model", "base_model", required=True, help="Base model name")
 @click.option("--prompt", default=None, help="Query prompt (if omitted, starts REPL)")
 @click.option("--max-tokens", default=512, type=int, help="Max tokens to generate")
 @click.option("--temp", default=0.7, type=float, help="Temperature for sampling")
-def elucidate(adapter_name, base_model, prompt, max_tokens, temp):
+def elucidate(adapter_name, prompt, max_tokens, temp):
     """Query a finetuned model."""
     if not client.is_daemon_running():
         display.error("Daemon is not running. Start it with: second-brain daemon start")
+        sys.exit(1)
+
+    from app.inference import get_base_model_from_adapter
+    base_model = get_base_model_from_adapter(adapter_name)
+    if not base_model:
+        display.error(f"Could not determine base model for adapter '{adapter_name}'. "
+                     "Ensure the adapter exists and has valid metadata.")
         sys.exit(1)
 
     try:

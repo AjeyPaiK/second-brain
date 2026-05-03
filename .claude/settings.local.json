@@ -45,7 +45,13 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('0.15.2'\\)\")",
       "Bash(curl -s \"https://pypi.org/pypi/bitsandbytes/0.46.1/json\")",
       "Bash(python3 -c ' *)",
-      "Bash(curl -s \"https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/\")"
+      "Bash(curl -s \"https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/\")",
+      "Bash(rm -rf .venv)",
+      "Bash(python3.10 -m venv .venv)",
+      "Bash(.venv/bin/pip install *)",
+      "Bash(.venv/bin/second-brain *)",
+      "Bash(nvcc --version)",
+      "Read(//etc/**)"
     ]
   }
 }

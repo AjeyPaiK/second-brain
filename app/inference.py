@@ -33,6 +33,22 @@ def get_latest_adapter_path(adapter_name: str) -> Optional[Path]:
     return versions[0] if versions else None
 
 
+def get_base_model_from_adapter(adapter_name: str) -> Optional[str]:
+    adapter_path = get_latest_adapter_path(adapter_name)
+    if adapter_path is None:
+        return None
+
+    metadata_file = adapter_path / "metadata.json"
+    if not metadata_file.exists():
+        return None
+
+    try:
+        metadata = json.loads(metadata_file.read_text())
+        return metadata.get("base_model")
+    except Exception:
+        return None
+
+
 def get_adapter_version(adapter_path: Path) -> str:
     return adapter_path.name
 
