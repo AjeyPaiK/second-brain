@@ -34,6 +34,24 @@ _active_future = None
 _active_future_lock = asyncio.Lock()
 
 
+def _run_training_with_logging(job_id: str, base_model: str, data_path: str,
+                                adapter_name: str, training_args_override: dict):
+    """Wrapper to ensure background thread exceptions are logged."""
+    try:
+        run_training_job(
+            job_id=job_id,
+            base_model=base_model,
+            data_path=data_path,
+            adapter_name=adapter_name,
+            training_args_override=training_args_override,
+        )
+    except Exception as exc:
+        log.exception("Uncaught exception in training thread for job %s", job_id)
+        store = get_store()
+        store.update_status(job_id, JobStatus.FAILED, error=f"Thread exception: {exc}")
+        store.append_log(job_id, f"ERROR: Uncaught exception: {exc}")
+
+
 class TrainingArgsIn(BaseModel):
     num_train_epochs: int = 3
     learning_rate: float = 2e-4
@@ -128,7 +146,7 @@ async def understand(body: UnderstandRequest):
 
     async with _active_future_lock:
         _active_future = _executor.submit(
-            run_training_job,
+            _run_training_with_logging,
             job_id=job.job_id,
             base_model=body.base_model,
             data_path=body.data_path,

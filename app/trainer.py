@@ -71,15 +71,18 @@ def _should_quantize(model_name_or_path: str) -> bool:
 
 
 def _load_model_and_tokenizer(base_model: str, use_4bit: bool):
+    log.info("Downloading/loading tokenizer from %s...", base_model)
     tokenizer = AutoTokenizer.from_pretrained(
         base_model,
         trust_remote_code=True,
         use_fast=True,
     )
+    log.info("Tokenizer loaded successfully")
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.pad_token_id = tokenizer.eos_token_id
 
+    log.info("Downloading/loading base model from %s...", base_model)
     if use_4bit:
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -100,6 +103,7 @@ def _load_model_and_tokenizer(base_model: str, use_4bit: bool):
             device_map=get_device_map(),
             trust_remote_code=True,
         )
+    log.info("Base model loaded successfully")
 
     model.config.use_cache = False
     model.config.pretraining_tp = 1

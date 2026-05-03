@@ -84,10 +84,13 @@ def _load_for_inference(base_model: str, adapter_path: str):
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
+    log.info("Downloading/loading tokenizer from %s...", adapter_path)
     tokenizer = AutoTokenizer.from_pretrained(adapter_path, trust_remote_code=True)
+    log.info("Tokenizer loaded successfully")
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    log.info("Downloading/loading base model from %s...", base_model)
     use_4bit = _should_quantize(base_model)
     if use_4bit:
         bnb_config = BitsAndBytesConfig(
@@ -109,8 +112,11 @@ def _load_for_inference(base_model: str, adapter_path: str):
             device_map=get_device_map(),
             trust_remote_code=True,
         )
+    log.info("Base model loaded successfully")
 
+    log.info("Loading adapter from %s...", adapter_path)
     model = PeftModel.from_pretrained(base, adapter_path)
+    log.info("Adapter loaded successfully")
     model.eval()
 
     _cached_model = model
