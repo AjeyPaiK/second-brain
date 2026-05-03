@@ -1,7 +1,0 @@
-2026-05-02 01:34:09,649 INFO watcher watching /home/ajey/Projects/second-brain
-2026-05-02 01:34:14,679 INFO watcher queued /home/ajey/Projects/second-brain/notes/physics_bio.pdf (project=notes)
-2026-05-02 01:34:14,680 INFO watcher queued /home/ajey/Projects/second-brain/notes/physics_bio.pdf (project=notes)
-2026-05-02 01:34:17,845 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/embeddings "HTTP/1.1 200 OK"
-2026-05-02 01:34:17,921 INFO httpx HTTP Request: POST http://127.0.0.1:11434/api/embeddings "HTTP/1.1 200 OK"
-2026-05-02 01:34:18,222 INFO ingest ingested {'pdf': '/home/ajey/Projects/second-brain/notes/physics_bio.pdf', 'project': 'notes', 'collection': 'notes', 'pages': 2, 'chunks': 2, 'elapsed_sec': 0.54, 'skipped': False}
-2026-05-02 01:34:18,228 INFO watcher done: {'pdf': '/home/ajey/Projects/second-brain/notes/physics_bio.pdf', 'project': 'notes', 'collection': 'notes', 'pages': 2, 'chunks': 2, 'elapsed_sec': 0.54, 'skipped': False, 'moved_to': '/home/ajey/Projects/second-brain/processed/notes/physics_bio.pdf'}
