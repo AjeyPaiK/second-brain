@@ -73,8 +73,8 @@ CUDA device: NVIDIA ORIN Nano (nvgpu)
 bitsandbytes version: 0.46.1 (or higher)
 bitsandbytes loaded successfully
 ```
-
-## Step 6: Start the daemon
+# Next Steps
+## Start the daemon
 
 The daemon is a background process that handles training and inference. Start it:
 
@@ -95,48 +95,6 @@ second-brain daemon status
 ```
 
 You'll see GPU memory info and active job count.
-
-## Troubleshooting
-
-### ModuleNotFoundError: No module named 'torch'
-
-Make sure you're using the right venv:
-
-```bash
-which python  # should show ~/.venv/bin/python
-python --version  # should be 3.10.x
-```
-
-### CUDA not available after installing bitsandbytes
-
-The `libcudart.so` library may not be in your `LD_LIBRARY_PATH`. The systemd service sets it explicitly (see `second-brain-api.service`). Manually:
-
-```bash
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda-12.6/lib64
-```
-
-### RuntimeError: CUDA out of memory
-
-This is expected if you:
-- Try to run inference while training is in progress
-- Load a large model without QLoRA
-- Request inference during initial model loading
-
-The API returns HTTP 503 when training is active to prevent this.
-
-### bitsandbytes fails silently (no error, but 4-bit not used)
-
-Check if the CUDA kernels loaded:
-
-```bash
-.venv/bin/python -c "import bitsandbytes; print('CUDA kernels loaded' if hasattr(bitsandbytes, 'kernel_fn') else 'No CUDA kernels')"
-```
-
-If it fails, rebuild bitsandbytes from source (see Step 5 troubleshooting above).
-
----
-
-## Next Steps
 
 Once the daemon is running, you can use the CLI:
 
