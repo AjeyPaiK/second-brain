@@ -32,21 +32,13 @@ This must be first — other packages pin their versions to PyTorch's CUDA versi
 
 **If that URL changes**, check NVIDIA's download page: https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/
 
-## Step 3: Install bitsandbytes for ARM64
-
-bitsandbytes requires ARM64-specific wheels (≥0.46.0):
-
-```bash
-.venv/bin/pip install "bitsandbytes>=0.46.0"
-```
-
-## Step 4: Install remaining dependencies
+## Step 3: Install remaining dependencies
 
 ```bash
 .venv/bin/pip install -r requirements.txt
 ```
 
-## Step 5: Install second-brain CLI
+## Step 4: Install second-brain CLI
 
 ```bash
 .venv/bin/pip install -e .
@@ -58,7 +50,7 @@ This registers the `second-brain` command in `.venv/bin/`. Test it:
 second-brain --help
 ```
 
-## Step 6: Verify CUDA and bitsandbytes
+## Step 5: Verify CUDA and bitsandbytes
 
 ```bash
 .venv/bin/python << 'EOF'
@@ -80,17 +72,6 @@ CUDA available: True
 CUDA device: NVIDIA ORIN Nano (nvgpu)
 bitsandbytes version: 0.46.1 (or higher)
 bitsandbytes loaded successfully
-```
-
-### If bitsandbytes fails to load CUDA kernels
-
-The Jetson's nvgpu device may not be recognized. Fallback: build bitsandbytes from source:
-
-```bash
-git clone https://github.com/bitsandbytes-foundation/bitsandbytes.git
-cd bitsandbytes
-CUDA_VERSION=126 make cuda12x_nomatmul  # Orin uses compute capability 8.7
-.venv/bin/pip install .
 ```
 
 ## Step 6: Start the daemon
