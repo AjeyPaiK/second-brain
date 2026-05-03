@@ -27,9 +27,7 @@ This must be first — other packages pin their versions to PyTorch's CUDA versi
 .venv/bin/pip install --upgrade pip setuptools wheel
 
 # Install NVIDIA PyTorch wheel for Jetson
-.venv/bin/pip install \
-
-https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.5.0a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl
+.venv/bin/pip install https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-2.5.0a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl
 ```
 
 **If that URL changes**, check NVIDIA's download page: https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/
